@@ -1,0 +1,48 @@
+
+defaults:
+    verbose: True
+    request_headers:
+        x-auth-token: $ENVIRON['SERVICE_TOKEN']
+
+tests:
+- name: get compute api versions
+  GET: /
+  response_json_paths:
+      $.version.links[?rel = "self"].href: /$ENVIRON['COMPUTE_SERVICE']/
+      $.version.status: CURRENT
+
+- name: create server
+  POST: /servers
+  request_headers:
+      content-type: application/json
+  data:
+      server:
+          name: $ENVIRON['SERVER_NAME']
+          imageRef: $ENVIRON['IMAGE_REF']
+          flavorRef: $ENVIRON['FLAVOR_REF']
+          networks:
+            - uuid: $ENVIRON['NETWORK_REF']
+  status: 202
+  response_headers:
+      location: //servers/[a-f0-9-]+/
+  response_store_value:
+      $.server.id: server_id
+
+- name: verify server name
+  GET: /servers/$ENVIRON['SERVER_ID']
+  response_json_paths:
+      $.server.name: $ENVIRON['SERVER_NAME']
+
+- name: check server status is active
+  GET: /servers/$ENVIRON['SERVER_ID']
+  response_json_paths:
+      $.server.status: ACTIVE
+
+- name: verify floating ip in server addresses
+  GET: /servers/$ENVIRON['SERVER_ID']
+  response_json_paths:
+      $.server.addresses.*[?"OS-EXT-IPS:type"="floating"].addr: $ENVIRON['FLOATING_IP']
+
+- name: delete server
+  DELETE: /servers/$ENVIRON['SERVER_ID']
+  status: 204

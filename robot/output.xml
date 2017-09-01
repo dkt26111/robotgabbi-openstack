@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generated="20170828 15:07:35.971" generator="Robot 3.0.2 (Python 2.7.12 on linux2)">
+<suite source="/home/dtruong/projects/sandbox/robotgabbi-openstack/robot/compute_scenarios.robot" id="s1" name="Compute Scenarios">
+<kw type="setup" name="User gets auth token" library="identity_keywords">
+<kw name="Get Auth Token" library="GabbiLibrary">
+<arguments>
+<arg>url=${BASE_URL}/${KEYSTONE_SERVICE}</arg>
+<arg>USER_NAME=${USER_NAME}</arg>
+<arg>DOMAIN_NAME=${DOMAIN_NAME}</arg>
+<arg>USER_PASSWORD=${USER_PASSWORD}</arg>
+<arg>PROJECT_NAME=${PROJECT_NAME}</arg>
+</arguments>
+<assign>
+<var>&amp;{RESP}</var>
+</assign>
+<msg timestamp="20170828 15:07:36.673" level="INFO">Running keyword 'get_auth_token' with arguments () and keywords {u'url': u'http://10.0.20.10/identity/v3', u'USER_PASSWORD': u'secretsecret', u'PROJECT_NAME': u'admin', u'USER_NAME': u'admin', u'DOMAIN_NAME': u'default'}.
+Setting env var url to http://10.0.20.10/identity/v3
+Setting env var USER_PASSWORD to secretsecret
+Setting env var PROJECT_NAME to admin
+Setting env var USER_NAME to admin
+Setting env var DOMAIN_NAME to default
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.078s
+
+OK</msg>
+<msg timestamp="20170828 15:07:36.674" level="INFO">&amp;{RESP} = { auth_token=gAAAAABZpJQo6AP1CFTsyuXBJcya5WldSKm6TN_snWx1onMjOkYTgNeSdo_q1pi9uJTnMSPy9UO9rPtuz84buG6jdWFxyk0TDcSlvemh0Szy9FpsKbsAUU8pL2beEw2kk8W2oItSC1JB1Z-HGOeFIyxaRh4_PhVzpBWWQAU3q29dAWByRn72Q9A }</msg>
+<status status="PASS" endtime="20170828 15:07:36.674" starttime="20170828 15:07:36.583"></status>
+</kw>
+<kw name="Set Environment Variable" library="OperatingSystem">
+<doc>Sets an environment variable to a specified value.</doc>
+<arguments>
+<arg>SERVICE_TOKEN</arg>
+<arg>${RESP.auth_token}</arg>
+</arguments>
+<msg timestamp="20170828 15:07:36.674" level="INFO">Environment variable 'SERVICE_TOKEN' set to value 'gAAAAABZpJQo6AP1CFTsyuXBJcya5WldSKm6TN_snWx1onMjOkYTgNeSdo_q1pi9uJTnMSPy9UO9rPtuz84buG6jdWFxyk0TDcSlvemh0Szy9FpsKbsAUU8pL2beEw2kk8W2oItSC1JB1Z-HGOeFIyxaRh4_PhVzpBWWQAU3q29dAWByRn72Q9A'.</msg>
+<status status="PASS" endtime="20170828 15:07:36.674" starttime="20170828 15:07:36.674"></status>
+</kw>
+<status status="PASS" endtime="20170828 15:07:36.674" starttime="20170828 15:07:36.583"></status>
+</kw>
+<test id="s1-t1" name="Verify SSH">
+<kw name="Given user creates server" library="compute_keywords">
+<arguments>
+<arg>${PRIVATE_NETWORK}</arg>
+</arguments>
+<kw name="Create Server" library="GabbiLibrary">
+<arguments>
+<arg>SERVER_NAME=${SERVER_NAME}</arg>
+<arg>IMAGE_REF=${IMAGE_REF}</arg>
+<arg>FLAVOR_REF=${FLAVOR_REF}</arg>
+<arg>NETWORK_REF=${network}</arg>
+</arguments>
+<assign>
+<var>&amp;{RESP}</var>
+</assign>
+<msg timestamp="20170828 15:07:37.272" level="INFO">Running keyword 'create_server' with arguments () and keywords {u'FLAVOR_REF': u'1', u'IMAGE_REF': u'12b3fa7b-266d-4ead-b39a-183a0d4e518d', u'SERVER_NAME': u'new-server-one', u'NETWORK_REF': u'3900e06d-0c02-4fa4-ae40-47ea57a6cce4'}.
+Setting env var FLAVOR_REF to 1
+Setting env var IMAGE_REF to 12b3fa7b-266d-4ead-b39a-183a0d4e518d
+Setting env var SERVER_NAME to new-server-one
+Setting env var NETWORK_REF to 3900e06d-0c02-4fa4-ae40-47ea57a6cce4
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.585s
+
+OK</msg>
+<msg timestamp="20170828 15:07:37.272" level="INFO">&amp;{RESP} = { server_id=3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7 }</msg>
+<status status="PASS" endtime="20170828 15:07:37.272" starttime="20170828 15:07:36.675"></status>
+</kw>
+<kw name="Set Suite Variable" library="BuiltIn">
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<arguments>
+<arg>${server_id}</arg>
+<arg>${RESP.server_id}</arg>
+</arguments>
+<msg timestamp="20170828 15:07:37.273" level="INFO">${server_id} = 3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7</msg>
+<status status="PASS" endtime="20170828 15:07:37.273" starttime="20170828 15:07:37.272"></status>
+</kw>
+<status status="PASS" endtime="20170828 15:07:37.273" starttime="20170828 15:07:36.675"></status>
+</kw>
+<kw name="and server is active" library="compute_keywords">
+<kw name="Wait Until Keyword Succeeds" library="BuiltIn">
+<doc>Runs the specified keyword and retries if it fails.</doc>
+<arguments>
+<arg>1 min</arg>
+<arg>5 sec</arg>
+<arg>check server status is active</arg>
+<arg>SERVER_ID=${server_id}</arg>
+</arguments>
+<kw name="Check Server Status Is Active" library="GabbiLibrary">
+<arguments>
+<arg>SERVER_ID=${server_id}</arg>
+</arguments>
+<msg timestamp="20170828 15:07:37.468" level="INFO">Running keyword 'check_server_status_is_active' with arguments () and keywords {u'SERVER_ID': u'3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7'}.
+Setting env var SERVER_ID to 3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7
+F
+======================================================================
+FAIL: test_request (dummy.nova_check_server_status_is_active)
+dummy.nova_check_server_status_is_active.test_request
+----------------------------------------------------------------------
+_StringException: Traceback (most recent call last):
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/case.py", line 93, in wrapper
+    func(self)
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/case.py", line 141, in test_request
+    self._run_test()
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/case.py", line 499, in _run_test
+    self._assert_response()
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/case.py", line 186, in _assert_response
+    handler(self)
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/handlers/base.py", line 54, in __call__
+    self.action(test, item, value=value)
+  File "/home/dtruong/projects/sandbox/gabbi/gabbi/handlers/jsonhandler.py", line 109, in action
+    (path, expected, match))
+  File "/home/dtruong/.local/lib/python2.7/site-packages/testtools/testcase.py", line 411, in assertEqual
+    self.assertThat(observed, matcher, message)
+  File "/home/dtruong/.local/lib/python2.7/site-packages/testtools/testcase.py", line 498, in assertThat
+    raise mismatch_error
+testtools.matchers._impl.MismatchError: 'ACTIVE' != u'BUILD': Unable to match $.server.status as ACTIVE, got BUILD
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.182s
+
+FAILED (failures=1)</msg>
+<msg timestamp="20170828 15:07:37.468" level="FAIL">Testcase check_server_status_is_active failed.</msg>
+<status status="FAIL" endtime="20170828 15:07:37.468" starttime="20170828 15:07:37.274"></status>
+</kw>
+<kw name="Check Server Status Is Active" library="GabbiLibrary">
+<arguments>
+<arg>SERVER_ID=${server_id}</arg>
+</arguments>
+<msg timestamp="20170828 15:07:42.716" level="INFO">Running keyword 'check_server_status_is_active' with arguments () and keywords {u'SERVER_ID': u'3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7'}.
+Setting env var SERVER_ID to 3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.236s
+
+OK</msg>
+<status status="PASS" endtime="20170828 15:07:42.716" starttime="20170828 15:07:42.468"></status>
+</kw>
+<status status="PASS" endtime="20170828 15:07:42.716" starttime="20170828 15:07:37.273"></status>
+</kw>
+<status status="PASS" endtime="20170828 15:07:42.716" starttime="20170828 15:07:37.273"></status>
+</kw>
+<kw name="When user creates floating ip for server" library="network_keywords">
+<assign>
+<var>${floating_ip}</var>
+</assign>
+<kw name="List Active Ports" library="GabbiLibrary">
+<arguments>
+<arg>url=${BASE_URL}${NEUTRON_SERVICE}</arg>
+<arg>SERVER_ID=${server_id}</arg>
+</arguments>
+<assign>
+<var>&amp;{RESP}</var>
+</assign>
+<msg timestamp="20170828 15:07:42.808" level="INFO">Running keyword 'list_active_ports' with arguments () and keywords {u'url': u'http://10.0.20.10:9696', u'SERVER_ID': u'3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7'}.
+Setting env var url to http://10.0.20.10:9696
+Setting env var SERVER_ID to 3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7
+#### list active ports ####
+&gt; GET http://10.0.20.10:9696/v2.0/ports?device_id=3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7&amp;status=ACTIVE
+&gt; user-agent: gabbi/1.35.1 (Python urllib3)
+&gt; content-type: application/json
+&gt; x-auth-token: gAAAAABZpJQo6AP1CFTsyuXBJcya5WldSKm6TN_snWx1onMjOkYTgNeSdo_q1pi9uJTnMSPy9UO9rPtuz84buG6jdWFxyk0TDcSlvemh0Szy9FpsKbsAUU8pL2beEw2kk8W2oItSC1JB1Z-HGOeFIyxaRh4_PhVzpBWWQAU3q29dAWByRn72Q9A
+
+
+
+&lt; 200 OK
+&lt; Content-Type: application/json
+&lt; Content-Length: 980
+&lt; X-Openstack-Request-Id: req-eede080d-1953-4dbd-a200-f92bb59f19b1
+&lt; Date: Mon, 28 Aug 2017 22:07:42 GMT
+
+{
+  "ports": [
+    {
+      "allowed_address_pairs": [],
+      "extra_dhcp_opts": [],
+      "updated_at": "2017-08-28T22:07:40Z",
+      "device_owner": "compute:nova",
+      "revision_number": 8,
+      "port_security_enabled": true,
+      "binding:profile": {},
+      "fixed_ips": [
+        {
+          "subnet_id": "8b80169e-bf86-453b-b922-928ee0b129cd",
+          "ip_address": "10.0.0.10"
+        },
+        {
+          "subnet_id": "39067ac4-dc9a-4bbe-8ff0-03a7453c960b",
+          "ip_address": "fdfe:cb92:78aa:0:f816:3eff:fee5:e2b6"
+        }
+      ],
+      "id": "f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c",
+      "security_groups": [
+        "99b5fbf5-ae95-41b2-a987-b9a70d23bd0b"
+      ],
+      "binding:vif_details": {
+        "port_filter": true
+      },
+      "binding:vif_type": "bridge",
+      "mac_address": "fa:16:3e:e5:e2:b6",
+      "project_id": "dd82b4138ed44cc1b5784338b0f89d60",
+      "status": "ACTIVE",
+      "binding:host_id": "sandboxController",
+      "description": "",
+      "tags": [],
+      "device_id": "3c0ba81d-90e1-47c6-9ccf-f25ec420a0c7",
+      "name": "",
+      "admin_state_up": true,
+      "network_id": "3900e06d-0c02-4fa4-ae40-47ea57a6cce4",
+      "tenant_id": "dd82b4138ed44cc1b5784338b0f89d60",
+      "created_at": "2017-08-28T22:07:38Z",
+      "binding:vnic_type": "normal"
+    }
+  ]
+}
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.077s
+
+OK</msg>
+<msg timestamp="20170828 15:07:42.808" level="INFO">&amp;{RESP} = { port_id=f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c }</msg>
+<status status="PASS" endtime="20170828 15:07:42.808" starttime="20170828 15:07:42.717"></status>
+</kw>
+<kw name="Create Floating Ip" library="GabbiLibrary">
+<arguments>
+<arg>url=${BASE_URL}${NEUTRON_SERVICE}</arg>
+<arg>EXTERNAL_NET_ID=${PUBLIC_NETWORK}</arg>
+<arg>PORT_ID=${RESP.port_id}</arg>
+</arguments>
+<assign>
+<var>&amp;{RESP}</var>
+</assign>
+<msg timestamp="20170828 15:07:44.163" level="INFO">Running keyword 'create_floating_ip' with arguments () and keywords {u'url': u'http://10.0.20.10:9696', u'EXTERNAL_NET_ID': u'0da66817-f900-411e-998a-bc81397a1471', u'PORT_ID': u'f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c'}.
+Setting env var url to http://10.0.20.10:9696
+Setting env var EXTERNAL_NET_ID to 0da66817-f900-411e-998a-bc81397a1471
+Setting env var PORT_ID to f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c
+#### create floating ip ####
+&gt; POST http://10.0.20.10:9696/v2.0/floatingips
+&gt; user-agent: gabbi/1.35.1 (Python urllib3)
+&gt; content-type: application/json
+&gt; x-auth-token: gAAAAABZpJQo6AP1CFTsyuXBJcya5WldSKm6TN_snWx1onMjOkYTgNeSdo_q1pi9uJTnMSPy9UO9rPtuz84buG6jdWFxyk0TDcSlvemh0Szy9FpsKbsAUU8pL2beEw2kk8W2oItSC1JB1Z-HGOeFIyxaRh4_PhVzpBWWQAU3q29dAWByRn72Q9A
+
+{
+  "floatingip": {
+    "floating_network_id": "0da66817-f900-411e-998a-bc81397a1471",
+    "port_id": "f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c"
+  }
+}
+
+&lt; 201 Created
+&lt; Content-Type: application/json
+&lt; Content-Length: 546
+&lt; X-Openstack-Request-Id: req-13e5620b-6332-4c75-a3f7-58a73e83a942
+&lt; Date: Mon, 28 Aug 2017 22:07:44 GMT
+
+{
+  "floatingip": {
+    "router_id": "633f2510-f4d8-4916-ad8f-de2456dd60fb",
+    "status": "DOWN",
+    "description": "",
+    "tags": [],
+    "tenant_id": "dd82b4138ed44cc1b5784338b0f89d60",
+    "created_at": "2017-08-28T22:07:43Z",
+    "updated_at": "2017-08-28T22:07:43Z",
+    "floating_network_id": "0da66817-f900-411e-998a-bc81397a1471",
+    "fixed_ip_address": "10.0.0.10",
+    "floating_ip_address": "172.24.4.38",
+    "revision_number": 0,
+    "project_id": "dd82b4138ed44cc1b5784338b0f89d60",
+    "port_id": "f6ad6f6d-2cb0-439d-9ec7-d79c9259d70c",
+    "id": "c226b7e4-5716-4c35-b8e1-7aea15600497"
+  }
+}
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 1.343s
+
+OK</msg>
+<msg timestamp="20170828 15:07:44.164" level="INFO">&amp;{RESP} = { floating_ip_address=172.24.4.38 }</msg>
+<status status="PASS" endtime="20170828 15:07:44.164" starttime="20170828 15:07:42.808"></status>
+</kw>
+<msg timestamp="20170828 15:07:44.164" level="INFO">${floating_ip} = 172.24.4.38</msg>
+<status status="PASS" endtime="20170828 15:07:44.164" starttime="20170828 15:07:42.717"></status>
+</kw>
+<status status="PASS" endtime="20170828 15:07:44.164" critical="yes" starttime="20170828 15:07:36.674"></status>
+</test>
+<status status="PASS" endtime="20170828 15:07:44.164" starttime="20170828 15:07:35.972"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="0" pass="1">Critical Tests</stat>
+<stat fail="0" pass="1">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="0" id="s1" name="Compute Scenarios" pass="1">Compute Scenarios</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

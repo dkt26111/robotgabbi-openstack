@@ -1,0 +1,31 @@
+
+defaults:
+    verbose: True
+    request_headers:
+        x-auth-token: $ENVIRON['SERVICE_TOKEN']
+
+tests:
+- name: create floating ip
+  POST: /v2.0/floatingips
+  request_headers:
+      content-type: application/json
+  data:
+      floatingip:
+          floating_network_id: $ENVIRON['EXTERNAL_NET_ID']
+          port_id: $ENVIRON['PORT_ID']
+  status: 201
+  response_store_value:
+      $.floatingip.floating_ip_address: address
+      $.floatingip.id: id
+
+- name: delete floating ip
+  DELETE: /v2.0/floatingips/$ENVIRON['FLOATING_IP_ID']
+  status: 204
+
+- name: list active ports
+  GET: /v2.0/ports?device_id=$ENVIRON['SERVER_ID']&status=ACTIVE
+  request_headers:
+      content-type: application/json
+  status: 200
+  response_store_value:
+      $.ports[0].id: port_id
