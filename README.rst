@@ -61,3 +61,10 @@ FLAVOR_REF                       The flavor ID to use for compute testing
 PUBLIC_NETWORK                   The network ID of a public network to use for compute testing
 PRIVATE_NETWORK                  The network ID of a private network to use for compute testing
 ===============================  ======================================================================================================================================
+
+Hints
+-----
+In order for the SSH test to work, you may need to consider the following:
+
+* If you are running devstack in a VM, you have to execute the robot test suite from within your VM.
+* By default the security groups in devstack do not allow ssh traffic.  You need to add the rule to allow ssh traffic.
